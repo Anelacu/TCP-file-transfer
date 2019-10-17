@@ -4,24 +4,29 @@
 import socket
 import sys
 
+def exit():
+    print('exit')
+    sys.exit(1)
+
 # create a socket
 cli_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-hostname = 3.3
-port_no = 1.1
+
 # get hostname/IP address
 if len(sys.argv) != 3:
-    print('invalid no of arguments')
+    print('Invalid number of arguments')
+    exit()
 try:
     hostname = str(sys.argv[1])
     port_no = int(sys.argv[2])
 except ValueError:
     print("Invalid arguments")
+    exit()
 
 print(type(hostname), hostname)
 print(type(port_no), port_no)
 
 # connect socket to server
-#cli_socket.connect((hostname, port_no))
+cli_socket.connect((hostname, port_no))
 
 """
 while sth
