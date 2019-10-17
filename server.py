@@ -18,13 +18,15 @@ except ValueError:
 # Define socket, bind to specified port, on request ping back address
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST,PORT))
-    s.listen()
+    print('Server up and running.')
+    s.listen(5)
     conn, addr = s.accept()
     with conn:
-        print('Connected by address', addr)
         while True:
             data = conn.recv(1024)
+            print(str(addr) + ": " + data.decode('utf-8'))
+            myfile = open(data, "xb")
             if not data:
                 break
-                print('No data recieved')
-            conn.sendall(data)
+        print('Done recieving file')
+        conn.sendall(data)
