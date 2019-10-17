@@ -6,13 +6,22 @@ import sys
 
 # create a socket
 cli_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+hostname = 3.3
+port_no = 1.1
 # get hostname/IP address
-hostname = ""
-port_no = 0
+if len(sys.argv) != 3:
+    print('invalid no of arguments')
+try:
+    hostname = str(sys.argv[1])
+    port_no = int(sys.argv[2])
+except ValueError:
+    print("Invalid arguments")
+
+print(type(hostname), hostname)
+print(type(port_no), port_no)
 
 # connect socket to server
-# todo cli_socket.connect((hostname, port number))
+#cli_socket.connect((hostname, port_no))
 
 """
 while sth
@@ -26,4 +35,4 @@ while sth
 
     # process response
 """
-cli_socket.close()
+#cli_socket.close()
