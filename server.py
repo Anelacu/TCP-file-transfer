@@ -23,8 +23,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     conn, addr = s.accept()
     with conn:
         while True:
-            data = conn.recv(1024)
-            print(str(addr) + ": " + data.decode('utf-8'))
+            data = conn.recv(1024).decode('utf-8')
+            print(str(addr) + ": " + data)
             myfile = open(data, "xb")
             if not data:
                 break
