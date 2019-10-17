@@ -12,12 +12,15 @@ def exit():
 cli_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # get hostname/IP address
-if len(sys.argv) != 3:
+if len(sys.argv) != (5 or 4):
     print('Invalid number of arguments')
     exit()
 try:
     hostname = str(sys.argv[1])
     port_no = int(sys.argv[2])
+    command = str(sys.argv[3])
+    if command == "put" or command = "get":
+        file_name = sys.argv[4]
 except ValueError:
     print("Invalid arguments")
     exit()
@@ -40,4 +43,4 @@ while sth
 
     # process response
 """
-#cli_socket.close()
+cli_socket.close()
