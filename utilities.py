@@ -3,6 +3,8 @@
 # Lab group LB10
 import socket
 import sys
+from os import listdir
+from os.path import curdir
 
 ''' open the file and send it over the network via the socket --binary mode
     same as server's downloading of a file
@@ -25,8 +27,6 @@ def send_file(socket, filename):
             s.send(l)
         data.close()
         print('Done sending!')
-
-
 
 
 ''' create the file and store in it data received from the socket --exclusive binary
@@ -57,10 +57,26 @@ def recv_file(socket, filename):
                     break
             print('Done recieving file!')
 
-
+''' generate and send the directory listing from the server to the client
+    same as server's listing: USE os.listdir() or sth'''
 def send_listing(socket):
-    pass
+    """
+    Generates and sends the directory listing from the server to the client
+    Args:
+        param1(socket): The socket.
+    Raises:
+        Errors to be implemented later --TODO--
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        data = listdir(os.path.curdir)
+        s.connect((HOST,PORT))
+        print('Established connection from ' + addr)
+        s.send(data)
+        print('Done sending!')
 
 
+''' receive the listing from the server and print it on the screen
+    same as client's listing (request it, receive and print a file per line)
+    close afterwards but mabe in the client.py??'''
 def recv_listing(socket):
     pass
