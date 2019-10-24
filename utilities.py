@@ -30,7 +30,8 @@ def send_file(socket, filename):
 
 
 ''' create the file and store in it data received from the socket --exclusive binary
-    same as server's uploading of a file (but no overwriting!!!)
+    no overwriting of existing files
+    same as server's uploading of a file
     same as client's download/get request (but also need to close!!)'''
 def recv_file(socket, filename):
     """
@@ -77,6 +78,14 @@ def send_listing(socket):
 
 ''' receive the listing from the server and print it on the screen
     same as client's listing (request it, receive and print a file per line)
-    close afterwards but mabe in the client.py??'''
+    close afterwards but probs better in the client.py??'''
 def recv_listing(socket):
-    pass
+    '''docs go here'''
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST, PORT))
+        print('Established connection from', addr)
+        s.listen(5)
+        conn, addr = s.accept()
+        data = conn.recv(1024).decode('utf-8')
+        print('Listing received from the server')
+        print(data)

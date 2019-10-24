@@ -7,8 +7,11 @@ purpose of client.py:
     upload(put) open the local file, read data and close the connection --binary mode
         same as send_fie()
     download(get) create local file, read what server sent, stre it in the file, close the connection --exclusive binary mode
-        same as
-    listing(list) send a request message, receive data
+        same as recv_file()
+    listing(list) send a request message, receive data, print it
+        i.e. recv_listing()
+
+    close the connection after all of them
 """
 import socket
 import sys

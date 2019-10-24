@@ -4,8 +4,11 @@
 """
 Purpose of server.py:
     upload a file (request type and the filename -- exclusive binary mode)
+        same as recv_file()
     download a file (open the file in binary mode)
+        same as send_file()
     list 1st level directory contents
+        i.e. send_listing()
 
 print reoprt on the console after a request was processed
 """
