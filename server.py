@@ -1,6 +1,15 @@
 # server.py file for NOSE assessed exercise 1
 # Authors - Magdalena Latifa 2398248l and Ivan Nikitin 2292523n
 # Lab group LB10
+"""
+Purpose of server.py:
+    upload a file (request type and the filename)
+    download a file (open the file in binary mode)
+    list 1st level directory contents
+
+print reoprt on the console after a request was processed 
+"""
+
 import sys
 import socket
 import os
@@ -14,7 +23,7 @@ try:
 except ValueError:
     print("Invalid argument - int expected")
 
-# test server
+
 # Define socket, bind to specified port, on request ping back address
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST,PORT))
