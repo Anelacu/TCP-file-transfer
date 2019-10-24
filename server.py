@@ -3,11 +3,11 @@
 # Lab group LB10
 """
 Purpose of server.py:
-    upload a file (request type and the filename)
+    upload a file (request type and the filename -- exclusive binary mode)
     download a file (open the file in binary mode)
     list 1st level directory contents
 
-print reoprt on the console after a request was processed 
+print reoprt on the console after a request was processed
 """
 
 import sys

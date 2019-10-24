@@ -1,6 +1,13 @@
 # client.py file for NOSE assessed exercise 1
 # Authors - Magdalena Latifa 2398248l and Ivan Nikitin 2292523n
 # Lab group LB10
+"""
+@args address of the server, server's port number, put/get/list, filename(for put and get)
+purpose of client.py:
+    upload(put) open the local file, read data and close the connection --binary mode
+    download(get) create local file, read what server sent, stre it in the file, close the connection --exclusive binary mode
+
+"""
 import socket
 import sys
 
