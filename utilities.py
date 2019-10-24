@@ -84,7 +84,7 @@ def recv_listing(socket):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         print('Established connection from', addr)
-        s.listen(5) 
+        s.listen(5)
         conn, addr = s.accept()
         data = conn.recv(1024).decode('utf-8')
         print('Listing received from the server')

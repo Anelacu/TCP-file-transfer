@@ -17,6 +17,7 @@ import socket
 import sys
 from utilities import send_file, recv_file, recv_listing
 
+# helper function to debug, can replace all with sys.exit(1) later
 def exit():
     print('exit')
     sys.exit(1)
@@ -31,9 +32,11 @@ cli_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     if len(sys.argv) > 5: # too many arguments given
         raise NumberError
+
     hostname = str(sys.argv[1])
     port_no = int(sys.argv[2])
     command = str(sys.argv[3])
+
     if command == "put" or command == "get":
         file_name = sys.argv[4]
     elif command == "list": # no argument expected afterwards
@@ -41,6 +44,7 @@ try:
             raise NumberError
     else: # incorrect command inputed
         raise ValueError
+
 except (IndexError, NumberError) as e:
     print('Invalid number of arguments')
     exit()

@@ -12,20 +12,25 @@ Purpose of server.py:
 
 print reoprt on the console after a request was processed
 """
-
 import sys
 import socket
 import os
+
+# helper function to debug, can replace all with sys.exit(1) later
+def exit():
+    print('exit')
+    sys.exit(1)
 
 # Define hostname and get port from user
 HOST = '0.0.0.0'
 if len(sys.argv) != 2:
     print('Expected two arguments - server file and port number')
+    exit()
 try:
     PORT = int(sys.argv[1])
 except ValueError:
     print("Invalid argument - int expected")
-
+    exit()
 
 # Define socket, bind to specified port, on request ping back address
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
