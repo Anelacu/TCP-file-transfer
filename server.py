@@ -34,35 +34,39 @@ except ValueError:
     print("Invalid argument - int expected")
     exit()
 
-# Define socket, bind to specified port, on request ping back address
+# Define socket of family IPv4 and type TCP
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    print('Server up and running.')
+    # Try to create server, raise error and exit on fail
+    try:
+        s.bind((HOST, PORT))
+        print('Server up and running.')
+    except socket.error as e:
+        print('Can not establish server.' + str(e))
+        exit()
+
     s.listen(5)
-    print("done listening")
     while True:
-        print("server into first while loop" )
-        cli_socket, addr = s.accept()  # = client socket and client address
-        print("server accepted a connection" )
+        # Connect with client, if that doesn't work break from current request
+        try:
+            cli_socket, addr = s.accept()
+            print("Derver accepted a connection." )
+        except socket.error as e:
+            print('Can not connect to client.' + str(e))
+            break
+
+        # Recieved and process request from client
         while True:
-            print("server into 2nd while loop" )
             data = cli_socket.recv(1024).decode('utf-8')
-            print("server data from receiving" + str(data))
+            print("Received data from client" + str(data))
             if len(data) == 0:
-                print("server got 0, break")
+                print("Server got no data")
                 break
             sent = send_listing(cli_socket)
-            print('server sent: ', sent)
+            print('Server sent: ', sent)
             if sent == 0:
-                print("server sent 0, break")
+                print("Server failed to send")
                 break
-            #if not data:
-                #break
+
         cli_socket.close()
-        print("server close connection")
-    print('Done recieving file')
-    cli_socket.sendall(data)
-
-'''
-
-'''
+        print("Server closed connection succesfully.")
+    print('Done receiving request.')

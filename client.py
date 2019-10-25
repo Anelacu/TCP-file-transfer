@@ -56,20 +56,19 @@ print(type(port_no), port_no)
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     con = s.connect((hostname, port_no))
     print("client connected")
-    while True:
-        print('into the while loop')
-        cmd_msg = command
-        sent = s.sendall(cmd_msg.encode('utf-8'))
-        print("clent sent=",sent)
-        print("sent", sent)
-        if sent == 0:
-            print('client sent 0, break conn')
-            break
-        received = recv_listing(s)
-        print("client recv= " + str(received))
-        if received == 0:
-            print('client recieved 0, break connection')
-            break
+
+    print('into the while loop')
+    cmd_msg = command
+    sent = s.sendall(cmd_msg.encode('utf-8'))
+    print("clent sent=",sent)
+    print("sent", sent)
+    if sent == 0:
+        print('client sent 0, break conn')
+    received = recv_listing(s)
+    print("client recv= " + str(received))
+    if received == 0:
+        print('client recieved 0, break connection')
+    exit()
 
 """
 while sth

@@ -8,7 +8,8 @@ from os import listdir
 from os.path import curdir
 
 
-''' open the file and send it over the network via the socket --binary mode
+''' DOC FOR REMOVING
+    open the file and send it over the network via the socket --binary mode
     same as server's downloading of a file
     same as client's upload/put request (but also need to close!!)'''
 def send_file(socket, filename):
@@ -31,11 +32,12 @@ def send_file(socket, filename):
         print('Done sending!')
 
 
-''' create the file and store in it data received from the socket --exclusive binary
+''' DOC FOR REMOVING
+    create the file and store in it data received from the socket --exclusive binary
     no overwriting of existing files
     same as server's uploading of a file
     same as client's download/get request (but also need to close!!)'''
-def recv_file(socket, filename):
+def recv_file(socket, file_name):
     """
     Creates file with given name and stores data recieved from socket
     Args:
@@ -44,23 +46,21 @@ def recv_file(socket, filename):
     Raises:
         Errors to be implemented later --TODO--
     """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST,PORT))
-        print('Server up and running.')
-        s.listen(5)
-        conn, addr = s.accept()
-        print('Established connection from ' + addr)
-        print('Recieving file...')
-        with conn:
-            while True:
-                data = conn.recv(1024).decode('utf-8')
-                print(str(addr) + ": " + data)
-                myfile = open(data, "xb")
-                if not data:
-                    break
-            print('Done recieving file!')
 
-''' generate and send the directory listing from the server to the client
+    data = ''
+    temp = ''
+    while True:
+        temp = socket.recv(1024).decode('utf-8')
+        data += temp
+        print(str(addr) + ": " + data)
+        myfile = open(data, "xb")
+        if temp == '':
+            break
+    print('Done recieving file!')
+    # TODO write the file here
+
+''' DOC FOR REMOVING
+    generate and send the directory listing from the server to the client
     same as server's listing: USE os.listdir() or sth'''
 def send_listing(socket):
     """
@@ -70,26 +70,34 @@ def send_listing(socket):
     Raises:
         Errors to be implemented later --TODO--
     """
-    data = listdir(os.path.curdir)
-    data = ' '.join(data)
-    data = data.encode('utf-8')
-    print(data)
-    bytes = socket.sendall(data)
-    print('Done sending! Bytes: ', bytes)
+    data = ' '.join(listdir(os.path.curdir)) +'EOF'
+    try:
+        bytes = socket.sendall(data.encode('utf-8'))
+        print('Done sending! Bytes: ', bytes)
+    except socket.error as e:
+        print('Cannot establish connection during sending' + str(e))
     return bytes
 
 
-''' receive the listing from the server and print it on the screen
+''' DOC FOR REMOVING
+    receive the listing from the server and print it on the screen
     same as client's listing (request it, receive and print a file per line)
-    close afterwards but probs better in the client.py??'''
+'''
 def recv_listing(socket):
     '''docs go here'''
-    data = ''
-    for i in range(10):
-        data += socket.recv(1024).decode('utf-8')
-        print('Listing received from the server ')
-        print(data)
-        if "\n" in data:
-            print('found new line and broke ')
-            break
+    data = []
+    temp = ' '
+
+    while len(temp) > 0 and "EOF" not in temp:
+        print('in while loop')
+        try:
+            temp = socket.recv(1024).decode('utf-8')
+            data.append(temp)
+        except socket.error as e:
+            print('Cannot establish connection during receiving' + str(e))
+
+    data = ' '.join(data)[:-3]
+    # Remove the 'EOF' which marks the end of the message
+    print('Listing received from the server')
+    print(data)
     return len(data)
