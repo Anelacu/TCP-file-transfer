@@ -21,15 +21,16 @@ def send_file(socket, filename):
     Raises:
         Errors to be implemented later --TODO--
     """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        data = open(filename,'xb')
-        s.connect((HOST, PORT))
-        print('Established connection from ' + addr)
-        l = data.read(1024)
-        while(l):
-            s.send(l)
-        data.close()
-        print('Done sending!')
+    try:
+        with open(file_name,'xb') as f:
+            data = f.read()
+        bytes = socket.sendall(data.encode('utf-8'))
+        print('Done sending! Bytes: ', bytes)
+    except socket.error as e:
+        print('Cannot establish connection during sending' + str(e))
+    except FileNotFoundError as e:
+        print('Cannot find the right file' + str(e))
+    return bytes
 
 
 ''' DOC FOR REMOVING
@@ -46,18 +47,19 @@ def recv_file(socket, file_name):
     Raises:
         Errors to be implemented later --TODO--
     """
-
-    data = ''
-    temp = ''
-    while True:
+    file_name = filename[:-4] + 'received' + filename[-4:]
+    data = []
+    temp = ' '
+    while len(temp) > 0 and "EOF" not in temp:
         temp = socket.recv(1024).decode('utf-8')
-        data += temp
+        data.append(temp)
         print(str(addr) + ": " + data)
-        myfile = open(data, "xb")
-        if temp == '':
-            break
     print('Done recieving file!')
-    # TODO write the file here
+    data = ''.join(data)
+    with open(file_name,'xb') as f:
+        f.write(data.encode('utf-8'))
+
+    return len(data)
 
 ''' DOC FOR REMOVING
     generate and send the directory listing from the server to the client
@@ -70,7 +72,7 @@ def send_listing(socket):
     Raises:
         Errors to be implemented later --TODO--
     """
-    data = ' '.join(listdir(os.path.curdir)) +'EOF'
+    data = '\n'.join(listdir(os.path.curdir)) +'EOF'
     try:
         bytes = socket.sendall(data.encode('utf-8'))
         print('Done sending! Bytes: ', bytes)
@@ -96,8 +98,8 @@ def recv_listing(socket):
         except socket.error as e:
             print('Cannot establish connection during receiving' + str(e))
 
-    data = ' '.join(data)[:-3]
+    data = ''.join(data)[:-3]
     # Remove the 'EOF' which marks the end of the message
-    print('Listing received from the server')
-    print(data)
+    print('Listing received from the server \n')
+    print(data + '\n')
     return len(data)
