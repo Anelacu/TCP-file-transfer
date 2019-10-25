@@ -51,6 +51,7 @@ except ValueError:
 print(type(hostname), hostname)
 print(type(port_no), port_no)
 
+call = {"put": send_file, "get": recv_file, "list": recv_listing}
 
 # create a socket and connect it
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -58,13 +59,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("client connected")
 
     print('into the while loop')
-    cmd_msg = command
-    sent = s.sendall(cmd_msg.encode('utf-8'))
+    sent = s.sendall((command+','+file_name).encode('utf-8'))
     print("clent sent=",sent)
     print("sent", sent)
     if sent == 0:
         print('client sent 0, break conn')
-    received = recv_listing(s)
+    received = call[command](s, file_name)
     print("client recv= " + str(received))
     if received == 0:
         print('client recieved 0, break connection')

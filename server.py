@@ -34,13 +34,15 @@ except ValueError:
     print("Invalid argument - int expected")
     exit()
 
+call = {"put": recv_file, "get": send_file, "list": send_listing}
+
 # Define socket of family IPv4 and type TCP
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # Try to create server, raise error and exit on fail
     try:
         s.bind((HOST, PORT))
         print('Server up and running.')
-    except socket.error as e:
+    except OSError as e:
         print('Can not establish server.' + str(e))
         exit()
 
@@ -50,18 +52,25 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             cli_socket, addr = s.accept()
             print("Derver accepted a connection." )
-        except socket.error as e:
+        except OSError as e:
             print('Can not connect to client.' + str(e))
             break
 
         # Recieved and process request from client
         while True:
             data = cli_socket.recv(1024).decode('utf-8')
-            print("Received data from client" + str(data))
+            print(data)
+            try:
+                command, file_name = data.split(",")
+            except:
+                break
+            print("command", command, "fname", file_name)
+            print("Received data from client" + str(command))
             if len(data) == 0:
                 print("Server got no data")
                 break
-            sent = send_listing(cli_socket)
+
+            sent = call[command](cli_socket, file_name)
             print('Server sent: ', sent)
             if sent == 0:
                 print("Server failed to send")

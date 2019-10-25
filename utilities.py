@@ -12,7 +12,7 @@ from os.path import curdir
     open the file and send it over the network via the socket --binary mode
     same as server's downloading of a file
     same as client's upload/put request (but also need to close!!)'''
-def send_file(socket, filename):
+def send_file(socket, file_name):
     """
     Opens the file with the given file name and sends its data over networwk
     Args:
@@ -22,11 +22,13 @@ def send_file(socket, filename):
         Errors to be implemented later --TODO--
     """
     try:
-        with open(file_name,'xb') as f:
+        with open(file_name,'r') as f:
+            print('opened file to read')
             data = f.read()
+        data += "EOF"
         bytes = socket.sendall(data.encode('utf-8'))
         print('Done sending! Bytes: ', bytes)
-    except socket.error as e:
+    except OSError as e:
         print('Cannot establish connection during sending' + str(e))
     except FileNotFoundError as e:
         print('Cannot find the right file' + str(e))
@@ -47,24 +49,26 @@ def recv_file(socket, file_name):
     Raises:
         Errors to be implemented later --TODO--
     """
-    file_name = filename[:-4] + 'received' + filename[-4:]
+    file_name = file_name[:-4] + 'received' + file_name[-4:]
     data = []
     temp = ' '
     while len(temp) > 0 and "EOF" not in temp:
+        print("in the file rec loop")
         temp = socket.recv(1024).decode('utf-8')
+        print("got this temp", temp)
         data.append(temp)
-        print(str(addr) + ": " + data)
+        #print(str(addr) + ": " + data)
     print('Done recieving file!')
-    data = ''.join(data)
-    with open(file_name,'xb') as f:
-        f.write(data.encode('utf-8'))
+    data = ''.join(data)[:-3]
+    with open(file_name,'x') as f:
+        f.write(data)
 
     return len(data)
 
 ''' DOC FOR REMOVING
     generate and send the directory listing from the server to the client
     same as server's listing: USE os.listdir() or sth'''
-def send_listing(socket):
+def send_listing(socket, file_name):
     """
     Generates and sends the directory listing from the server to the client
     Args:
@@ -76,7 +80,7 @@ def send_listing(socket):
     try:
         bytes = socket.sendall(data.encode('utf-8'))
         print('Done sending! Bytes: ', bytes)
-    except socket.error as e:
+    except OSError as e:
         print('Cannot establish connection during sending' + str(e))
     return bytes
 
@@ -85,7 +89,7 @@ def send_listing(socket):
     receive the listing from the server and print it on the screen
     same as client's listing (request it, receive and print a file per line)
 '''
-def recv_listing(socket):
+def recv_listing(socket, file_name):
     '''docs go here'''
     data = []
     temp = ' '
@@ -95,7 +99,7 @@ def recv_listing(socket):
         try:
             temp = socket.recv(1024).decode('utf-8')
             data.append(temp)
-        except socket.error as e:
+        except OSError as e:
             print('Cannot establish connection during receiving' + str(e))
 
     data = ''.join(data)[:-3]
