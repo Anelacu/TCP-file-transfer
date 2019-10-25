@@ -15,6 +15,8 @@ print reoprt on the console after a request was processed
 import sys
 import socket
 import os
+from utilities import *
+
 
 # helper function to debug, can replace all with sys.exit(1) later
 def exit():
@@ -24,7 +26,7 @@ def exit():
 # Define hostname and get port from user
 HOST = '0.0.0.0'
 if len(sys.argv) != 2:
-    print('Expected two arguments - server file and port number')
+    print('Expected just a port number')
     exit()
 try:
     PORT = int(sys.argv[1])
@@ -34,16 +36,33 @@ except ValueError:
 
 # Define socket, bind to specified port, on request ping back address
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST,PORT))
+    s.bind((HOST, PORT))
     print('Server up and running.')
     s.listen(5)
-    conn, addr = s.accept()
-    with conn:
+    print("done listening")
+    while True:
+        print("server into first while loop" )
+        cli_socket, addr = s.accept()  # = client socket and client address
+        print("server accepted a connection" )
         while True:
-            data = conn.recv(1024).decode('utf-8')
-            print(str(addr) + ": " + data)
-            myfile = open(data, "xb")
-            if not data:
+            print("server into 2nd while loop" )
+            data = cli_socket.recv(1024).decode('utf-8')
+            print("server data from receiving" + str(data))
+            if len(data) == 0:
+                print("server got 0, break")
                 break
-        print('Done recieving file')
-        conn.sendall(data)
+            sent = send_listing(cli_socket)
+            print('server sent: ', sent)
+            if sent == 0:
+                print("server sent 0, break")
+                break
+            #if not data:
+                #break
+        cli_socket.close()
+        print("server close connection")
+    print('Done recieving file')
+    cli_socket.sendall(data)
+
+'''
+
+'''

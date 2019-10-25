@@ -3,8 +3,10 @@
 # Lab group LB10
 import socket
 import sys
+import os
 from os import listdir
 from os.path import curdir
+
 
 ''' open the file and send it over the network via the socket --binary mode
     same as server's downloading of a file
@@ -20,7 +22,7 @@ def send_file(socket, filename):
     """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         data = open(filename,'xb')
-        s.connect((HOST,PORT))
+        s.connect((HOST, PORT))
         print('Established connection from ' + addr)
         l = data.read(1024)
         while(l):
@@ -68,12 +70,13 @@ def send_listing(socket):
     Raises:
         Errors to be implemented later --TODO--
     """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        data = listdir(os.path.curdir)
-        s.connect((HOST,PORT))
-        print('Established connection from ' + addr)
-        s.send(data)
-        print('Done sending!')
+    data = listdir(os.path.curdir)
+    data = ' '.join(data)
+    data = data.encode('utf-8')
+    print(data)
+    bytes = socket.sendall(data)
+    print('Done sending! Bytes: ', bytes)
+    return bytes
 
 
 ''' receive the listing from the server and print it on the screen
@@ -81,11 +84,12 @@ def send_listing(socket):
     close afterwards but probs better in the client.py??'''
 def recv_listing(socket):
     '''docs go here'''
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
-        print('Established connection from', addr)
-        s.listen(5)
-        conn, addr = s.accept()
-        data = conn.recv(1024).decode('utf-8')
-        print('Listing received from the server')
+    data = ''
+    for i in range(10):
+        data += socket.recv(1024).decode('utf-8')
+        print('Listing received from the server ')
         print(data)
+        if "\n" in data:
+            print('found new line and broke ')
+            break
+    return len(data)

@@ -17,6 +17,7 @@ import socket
 import sys
 from utilities import send_file, recv_file, recv_listing
 
+
 # helper function to debug, can replace all with sys.exit(1) later
 def exit():
     print('exit')
@@ -25,18 +26,14 @@ def exit():
 class NumberError(Exception):
     pass
 
-# create a socket
-cli_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
 # get hostname/IP address
 try:
     if len(sys.argv) > 5: # too many arguments given
         raise NumberError
-
     hostname = str(sys.argv[1])
     port_no = int(sys.argv[2])
     command = str(sys.argv[3])
-
+    file_name = ''
     if command == "put" or command == "get":
         file_name = sys.argv[4]
     elif command == "list": # no argument expected afterwards
@@ -44,7 +41,6 @@ try:
             raise NumberError
     else: # incorrect command inputed
         raise ValueError
-
 except (IndexError, NumberError) as e:
     print('Invalid number of arguments')
     exit()
@@ -55,8 +51,25 @@ except ValueError:
 print(type(hostname), hostname)
 print(type(port_no), port_no)
 
-# connect socket to server
-cli_socket.connect((hostname, port_no))
+
+# create a socket and connect it
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    con = s.connect((hostname, port_no))
+    print("client connected")
+    while True:
+        print('into the while loop')
+        cmd_msg = command
+        sent = s.sendall(cmd_msg.encode('utf-8'))
+        print("clent sent=",sent)
+        print("sent", sent)
+        if sent == 0:
+            print('client sent 0, break conn')
+            break
+        received = recv_listing(s)
+        print("client recv= " + str(received))
+        if received == 0:
+            print('client recieved 0, break connection')
+            break
 
 """
 while sth
@@ -70,4 +83,3 @@ while sth
 
     # process response
 """
-cli_socket.close()
