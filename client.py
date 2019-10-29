@@ -15,8 +15,12 @@ purpose of client.py:
 """
 import socket
 import sys
-from utilities import send_file, recv_file, recv_listing
-
+import inspect
+import os
+"""currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)"""
+from utilities import *
 
 # helper function to debug, can replace all with sys.exit(1) later
 def exit():

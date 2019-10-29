@@ -15,8 +15,11 @@ print reoprt on the console after a request was processed
 import sys
 import socket
 import os
+import inspect
+"""currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)"""
 from utilities import *
-
 
 # helper function to debug, can replace all with sys.exit(1) later
 def exit():
