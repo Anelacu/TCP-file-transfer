@@ -5,7 +5,7 @@
 @args address of the server, server's port number, put/get/list, filename(for put and get)
 purpose of client.py:
     upload(put) open the local file, read data and close the connection --binary mode
-        same as send_fie()
+        same as send_file()
     download(get) create local file, read what server sent, stre it in the file, close the connection --exclusive binary mode
         same as recv_file()
     listing(list) send a request message, receive data, print it
@@ -15,12 +15,7 @@ purpose of client.py:
 """
 import socket
 import sys
-import inspect
-import os
-"""currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0,parentdir)"""
-from utilities import *
+from utilities import send_file, recv_file, recv_listing
 
 # helper function to debug, can replace all with sys.exit(1) later
 def exit():

@@ -7,7 +7,6 @@ import os
 from os import listdir
 from os.path import curdir
 
-
 ''' DOC FOR REMOVING
     open the file and send it over the network via the socket --binary mode
     same as server's downloading of a file
@@ -22,11 +21,11 @@ def send_file(socket, file_name):
         Errors to be implemented later --TODO--
     """
     try:
-        with open(file_name,'r') as f:
+        with open(file_name,'rb') as f:
             print('opened file to read')
             data = f.read()
         data += "EOF"
-        bytes = socket.sendall(data.encode('utf-8'))
+        bytes = socket.sendall(str.encode(data))
         print('Done sending! Bytes: ', bytes)
     except OSError as e:
         print('Cannot establish connection during sending' + str(e))
@@ -49,18 +48,17 @@ def recv_file(socket, file_name):
     Raises:
         Errors to be implemented later --TODO--
     """
-    file_name = file_name[:-4] + 'received' + file_name[-4:]
     data = []
     temp = ' '
     while len(temp) > 0 and "EOF" not in temp:
         print("in the file rec loop")
-        temp = socket.recv(1024).decode('utf-8')
+        temp = socket.recv(1024).decode()
         print("got this temp", temp)
         data.append(temp)
         #print(str(addr) + ": " + data)
     print('Done recieving file!')
     data = ''.join(data)[:-3]
-    with open(file_name,'x') as f:
+    with open(file_name,'xb') as f:
         f.write(data)
 
     return len(data)
@@ -78,7 +76,7 @@ def send_listing(socket, file_name):
     """
     data = '\n'.join(listdir(os.path.curdir)) +'EOF'
     try:
-        bytes = socket.sendall(data.encode('utf-8'))
+        bytes = socket.sendall(str.encode(data))
         print('Done sending! Bytes: ', bytes)
     except OSError as e:
         print('Cannot establish connection during sending' + str(e))
@@ -97,7 +95,7 @@ def recv_listing(socket, file_name):
     while len(temp) > 0 and "EOF" not in temp:
         print('in while loop')
         try:
-            temp = socket.recv(1024).decode('utf-8')
+            temp = socket.recv(1024).decode()
             data.append(temp)
         except OSError as e:
             print('Cannot establish connection during receiving' + str(e))
