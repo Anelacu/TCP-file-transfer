@@ -63,12 +63,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             except:
                 break
             print("command", command, "fname", file_name)
-            print("Received data from client" + str(command))
+            print("Received data from client " + str(command))
+
             if len(data) == 0:
                 print("Server got no data")
                 break
 
-            sent = call[command](cli_socket, file_name)
+                sent = call[command](cli_socket, file_name)
+                print('Client closed')
             print('Server sent: ', sent)
             if sent == 0:
                 print("Server failed to send")
