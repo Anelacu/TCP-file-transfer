@@ -57,8 +57,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
         # Recieved and process request from client
         while True:
-            data = cli_socket.recv(1024).decode('utf-8')
-            print(data)
+            data = cli_socket.recv(1024).decode()
             try:
                 command, file_name = data.split(",")
             except:

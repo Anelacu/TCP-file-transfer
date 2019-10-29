@@ -20,25 +20,23 @@ def send_file(socket, file_name):
     Raises:
         Errors to be implemented later --TODO--
     """
-    """try:
-        with open(file_name,'rb') as f:
-            print('opened file to read')
-            data = f.read()
-        data += "EOF".encode()
-        bytes = socket.sendall(data)
-        print('Done sending! Bytes: ', bytes)
-    except OSError as e:
-        print('Cannot establish connection during sending' + str(e))
-    except FileNotFoundError as e:
-        print('Cannot find the right file' + str(e))"""
 
     print("Sending:", file_name)
-    with open(file_name, 'rb') as f:
-        raw = f.read()
-    # Send actual length ahead of data, with fixed byteorder and size
-    socket.sendall(len(raw).to_bytes(8, 'big'))
-    # You have the whole thing in memory anyway; don't bother chunking
-    socket.sendall(raw)
+    try:
+        with open(file_name, 'rb') as f:
+            raw = f.read()
+    except IOError:
+        print("There was an error openning the file, make sure it exists.")
+        sys.exit(1)
+
+    # Send actual length ahead of data, fix byteorder and size
+    try:
+        socket.sendall(len(raw).to_bytes(8, 'big'))
+        # No need to chunk as we have it all in memory
+        socket.sendall(raw)
+    except OSError as e:
+        print('Cannot establish connection during sending' + str(e))
+        sys.exit(1)
 
 
 ''' DOC FOR REMOVING
@@ -68,17 +66,17 @@ def recv_file(socket, file_name):
     data = data.encode()
     with open(file_name,'xb') as f:
         f.write(data)"""
-    # Get the expected length (eight bytes long, always)
+    # Get the expected length which will always be 8 bytes
     expected_size = b""
     while len(expected_size) < 8:
         more_size = socket.recv(8 - len(expected_size))
         expected_size += more_size
 
-    # Convert to int, the expected file length
+    # the expected file length
     expected_size = int.from_bytes(expected_size, 'big')
 
-    # Until we've received the expected amount of data, keep receiving
-    packet = b""  # Use bytes, not str, to accumulate
+    # keep receiving until we reach expected length of file
+    packet = b""
     while len(packet) < expected_size:
         buffer = socket.recv(expected_size - len(packet))
         if not buffer:
@@ -87,7 +85,6 @@ def recv_file(socket, file_name):
     with open(file_name, 'wb') as f:
         f.write(packet)
 
-    #return len(data)
 
 ''' DOC FOR REMOVING
     generate and send the directory listing from the server to the client
@@ -100,13 +97,29 @@ def send_listing(socket, file_name):
     Raises:
         Errors to be implemented later --TODO--
     """
-    data = '\n'.join(listdir(os.path.curdir)) +'EOF'
+
+    """OLD OLD OLD  +'EOF'
     try:
         bytes = socket.sendall(str.encode(data))
         print('Done sending! Bytes: ', bytes)
     except OSError as e:
         print('Cannot establish connection during sending' + str(e))
-    return bytes
+    return bytes"""
+    print("Sending:", file_name)
+    try:
+        data = '\n'.join(listdir(os.path.curdir))
+    except IOError:
+        print("There was an error reading the directories.")
+        sys.exit(1)
+
+    # Send actual length ahead of data, fix byteorder and size
+    try:
+        socket.sendall(len(data).to_bytes(8, 'big'))
+        # No need to chunk as we have it all in memory
+        socket.sendall(str.encode(data))
+    except OSError as e:
+        print('Cannot establish connection during sending' + str(e))
+        sys.exit(1)
 
 
 ''' DOC FOR REMOVING
@@ -115,7 +128,7 @@ def send_listing(socket, file_name):
 '''
 def recv_listing(socket, file_name):
     '''docs go here'''
-    data = []
+    '''data = []
     temp = ' '
 
     while len(temp) > 0 and "EOF" not in temp:
@@ -130,4 +143,21 @@ def recv_listing(socket, file_name):
     # Remove the 'EOF' which marks the end of the message
     print('Listing received from the server \n')
     print(data + '\n')
-    return len(data)
+    return len(data)'''
+    expected_size = b""
+    while len(expected_size) < 8:
+        more_size = socket.recv(8 - len(expected_size))
+        expected_size += more_size
+
+    # the expected file length
+    expected_size = int.from_bytes(expected_size, 'big')
+
+    # keep receiving until we reach expected length of file
+    packet = b""
+    while len(packet) < expected_size:
+        buffer = socket.recv(expected_size - len(packet))
+        if not buffer:
+            raise Exception("Incomplete file received")
+        packet += buffer
+    data = packet.decode()
+    print(data + '\n')
