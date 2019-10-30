@@ -16,6 +16,7 @@ purpose of client.py:
 import socket
 import sys
 from utilities import send_file, recv_file, recv_listing
+import os
 
 # helper function to debug, can replace all with sys.exit(1) later
 def exit():
@@ -33,7 +34,13 @@ try:
     port_no = int(sys.argv[2])
     command = str(sys.argv[3])
     file_name = ''
-    if command == "put" or command == "get":
+    if command == "put":
+        file_name = sys.argv[4]
+        if not os.path.exists(file_name):
+            print('Wrong file name')
+            sys.exit(1)
+
+    if command == "get":
         file_name = sys.argv[4]
     elif command == "list": # no argument expected afterwards
         if len(sys.argv) == 5: # there is an
@@ -54,30 +61,25 @@ call = {"put": send_file, "get": recv_file, "list": recv_listing}
 
 # create a socket and connect it
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    con = s.connect((hostname, port_no))
-    print("client connected")
+    try:
+        con = s.connect((hostname, port_no))
+    except IOError:
+        print('Client cant establish connection')
+    print("Client connected")
 
-    print('into the while loop')
-    sent = s.sendall((command+','+file_name).encode('utf-8'))
-    print("clent sent=",sent)
-    print("sent", sent)
-    if sent == 0:
-        print('client sent 0, break conn')
-    received = call[command](s, file_name)
+    sent = s.sendall((command+ ','+ file_name).encode())
+    if command == "get":
+        status = s.recv(1024).decode()
+        if status == "Good file name":
+            received = call[command](s, file_name)
+        else:
+            print("Check file name")
+            sys.exit(1)
+    else:
+        received = call[command](s, file_name)
+
     print("client recv= " + str(received))
-    if received == 0:
+    if received == None:
         print('client recieved 0, break connection')
+        #sys.exit(1)
     exit()
-
-"""
-while sth
-    # prepare req message
-
-    # send request
-    cli_socket.sendall (req message)
-
-    # receive response, if any
-    cli_socket.recv (res message max length)
-
-    # process response
-"""

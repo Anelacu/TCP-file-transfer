@@ -64,13 +64,18 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 break
             print("command", command, "fname", file_name)
             print("Received data from client " + str(command))
+            if (command == 'get'):
+                if not os.path.exists(file_name):
+                    cli_socket.sendall(b"Bad file name")
+                    break
+                else:
+                    cli_socket.sendall(b"Good file name")
 
             if len(data) == 0:
                 print("Server got no data")
                 break
 
-                sent = call[command](cli_socket, file_name)
-                print('Client closed')
+            sent = call[command](cli_socket, file_name)
             print('Server sent: ', sent)
             if sent == 0:
                 print("Server failed to send")

@@ -53,7 +53,7 @@ def recv_file(socket, file_name):
             expected_size += more_size
         except OSError as e:
             print('Cannot establish connection during receiving' + str(e))
-            sys.exit(1)
+            break
 
     # the expected file length
     expected_size = int.from_bytes(expected_size, 'big')
@@ -63,6 +63,7 @@ def recv_file(socket, file_name):
     while len(packet) < expected_size:
         try:
             buffer = socket.recv(expected_size - len(packet))
+            print('trying')
         except OSError as e:
             print('Cannot establish connection during receiving' + str(e))
             sys.exit(1)
