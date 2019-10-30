@@ -50,20 +50,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # Connect with client, if that doesn't work break from current request
         try:
             cli_socket, addr = s.accept()
-            print("Derver accepted a connection." )
+            print("Server accepted a connection." )
         except OSError as e:
             print('Can not connect to client.' + str(e))
             break
 
         # Recieved and process request from client
         while True:
-            data = cli_socket.recv(1024).decode()
             try:
+                data = cli_socket.recv(1024).decode()
                 command, file_name = data.split(",")
             except:
                 break
-            print("command", command, "fname", file_name)
-            print("Received data from client " + str(command))
+
             if (command == 'get'):
                 if not os.path.exists(file_name):
                     cli_socket.sendall(b"Bad file name")
@@ -76,7 +75,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 break
 
             sent = call[command](cli_socket, file_name)
-            print('Server sent: ', sent)
+
             if sent == 0:
                 print("Server failed to send")
                 break

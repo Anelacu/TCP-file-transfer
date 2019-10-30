@@ -30,12 +30,14 @@ def send_file(socket, file_name):
         socket.sendall(len(raw).to_bytes(8, 'big'))
         # No need to chunk as we have it all in memory
         socket.sendall(raw)
+        print('Sent')
     except OSError as e:
         print('Cannot establish connection during sending' + str(e))
         sys.exit(1)
 
 
 def recv_file(socket, file_name):
+
     """
     Creates file with given name and stores data recieved from socket
     Args:
@@ -46,6 +48,7 @@ def recv_file(socket, file_name):
         IOError if encounters errors with file
     """
     # Get the expected length which will always be 8 bytes
+    print('Accepting' + file_name)
     expected_size = b""
     while len(expected_size) < 8:
         try:
@@ -63,7 +66,6 @@ def recv_file(socket, file_name):
     while len(packet) < expected_size:
         try:
             buffer = socket.recv(expected_size - len(packet))
-            print('trying')
         except OSError as e:
             print('Cannot establish connection during receiving' + str(e))
             sys.exit(1)
@@ -72,8 +74,9 @@ def recv_file(socket, file_name):
         packet += buffer
 
     try:
-        with open(file_name, 'wb') as f:
+        with open(file_name, 'xb') as f:
             f.write(packet)
+            print('File received')
     except IOError:
         print("There was en error with writing to the file.")
         sys.exit(1)
@@ -101,12 +104,14 @@ def send_listing(socket, file_name):
         socket.sendall(len(data).to_bytes(8, 'big'))
         # No need to chunk as we have it all in memory
         socket.sendall(str.encode(data))
+        print('Sent listing')
     except OSError as e:
         print('Cannot establish connection during sending' + str(e))
         sys.exit(1)
 
 
 def recv_listing(socket, file_name):
+
     """
     Receives the listing from the server and prints it on the screen
     Args:

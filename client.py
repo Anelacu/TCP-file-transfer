@@ -20,7 +20,7 @@ import os
 
 # helper function to debug, can replace all with sys.exit(1) later
 def exit():
-    print('exit')
+    print('Client closed')
     sys.exit(1)
 
 class NumberError(Exception):
@@ -34,28 +34,29 @@ try:
     port_no = int(sys.argv[2])
     command = str(sys.argv[3])
     file_name = ''
+
     if command == "put":
-        file_name = sys.argv[4]
+        file_name = str(sys.argv[4])
         if not os.path.exists(file_name):
             print('Wrong file name')
             sys.exit(1)
 
     if command == "get":
-        file_name = sys.argv[4]
+        file_name = str(sys.argv[4])
+
     elif command == "list": # no argument expected afterwards
         if len(sys.argv) == 5: # there is an
             raise NumberError
-    else: # incorrect command inputed
-        raise ValueError
+
+    '''else: # incorrect command inputed
+        raise ValueError'''
+
 except (IndexError, NumberError) as e:
     print('Invalid number of arguments')
     exit()
 except ValueError:
     print("Invalid arguments")
     exit()
-
-print(type(hostname), hostname)
-print(type(port_no), port_no)
 
 call = {"put": send_file, "get": recv_file, "list": recv_listing}
 
@@ -67,7 +68,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print('Client cant establish connection')
     print("Client connected")
 
-    sent = s.sendall((command+ ','+ file_name).encode())
+    file_name = "imgTest.png"
+    msg = command + ',' + file_name ## there is something wrong with sys args
+    print(command)
+
+    sent = s.sendall((command+ ',' + "imgTest.png").encode())
     if command == "get":
         status = s.recv(1024).decode()
         if status == "Good file name":
@@ -78,8 +83,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     else:
         received = call[command](s, file_name)
 
-    print("client recv= " + str(received))
-    if received == None:
-        print('client recieved 0, break connection')
-        #sys.exit(1)
     exit()
