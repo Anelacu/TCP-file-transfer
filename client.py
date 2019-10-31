@@ -41,15 +41,15 @@ try:
             print('Wrong file name')
             sys.exit(1)
 
-    if command == "get":
+    elif command == "get":
         file_name = str(sys.argv[4])
 
     elif command == "list": # no argument expected afterwards
         if len(sys.argv) == 5: # there is an
             raise NumberError
 
-    '''else: # incorrect command inputed
-        raise ValueError'''
+    else: # incorrect command inputed
+        raise ValueError
 
 except (IndexError, NumberError) as e:
     print('Invalid number of arguments')
@@ -68,11 +68,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print('Client cant establish connection')
     print("Client connected")
 
-    file_name = "imgTest.png"
-    msg = command + ',' + file_name ## there is something wrong with sys args
-    print(command)
 
-    sent = s.sendall((command+ ',' + "imgTest.png").encode())
+    msg = command + ',' + file_name ## there is something wrong with sys args
+    print(msg)
+    sent = s.sendall((msg).encode())
     if command == "get":
         status = s.recv(1024).decode()
         if status == "Good file name":
