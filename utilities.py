@@ -17,23 +17,7 @@ def send_file(socket, file_name):
         OSError if can not establish connection
         IOError if encounters errors with file
     """
-    '''print("Sending:", file_name)
-    try:
-        with open(file_name, 'rb') as f:
-            raw = f.read()
-    except IOError:
-        print("There was an error openning the file, make sure it exists.")
-        return
-
-    # Send actual length ahead of data, fix byteorder and size
-    try:
-        socket.sendall(len(raw).to_bytes(8, 'big'))
-        # No need to chunk as we have it all in memory
-        socket.sendall(raw)
-        print('Sent')
-    except OSError as e:
-        print('Cannot establish connection during sending' + str(e))
-        return'''
+    
     with open(file_name, 'rb') as r:
         data = r.read()
         # check data length in bytes and send it to client
@@ -53,40 +37,6 @@ def recv_file(socket, file_name):
         OSError if can not establish connection
         IOError if encounters errors with file
     """
-    # Get the expected length which will always be 8 bytes
-    '''print('Accepting' + file_name)
-    expected_size = b""
-    while len(expected_size) < 8:
-        try:
-            more_size = socket.recv(8 - len(expected_size))
-            expected_size += more_size
-        except OSError as e:
-            print('Cannot establish connection during receiving' + str(e))
-            break
-
-    # the expected file length
-    expected_size = int.from_bytes(expected_size, 'big')
-
-    # keep receiving until we reach expected length of file
-    packet = b""
-    while len(packet) < expected_size:
-        try:
-            buffer = socket.recv(expected_size - len(packet))
-        except OSError as e:
-            print('Cannot establish connection during receiving' + str(e))
-            sys.exit(1)
-        if not buffer:
-            raise Exception("Incomplete file received")
-        packet += buffer
-
-    try:
-        with open(file_name, 'xb') as f:
-            f.write(packet)
-            print('File received')
-    except IOError:
-        print("There was en error with writing to the file.")
-        sys.exit(1)'''
-
     remaining = int.from_bytes(socket.recv(16), 'big')
     try:
         d = open(file_name, "xb")
