@@ -7,6 +7,23 @@ import os
 from os import listdir
 from os.path import curdir
 
+
+def convert_to_bytes(no):
+    result = bytearray()
+    result.append(no & 255)
+    for i in range(3):
+        no = no >> 8
+        result.append(no & 255)
+    return result
+
+
+def bytes_to_number(b):
+    res = 0
+    for i in range(4):
+        res += b[i] << (i*8)
+    return res
+
+
 def send_file(socket, file_name):
     """
     Opens the file with the given file name and sends its data over networwk
@@ -23,17 +40,17 @@ def send_file(socket, file_name):
             raw = f.read()
     except IOError:
         print("There was an error openning the file, make sure it exists.")
-        sys.exit(1)
+        return
 
     # Send actual length ahead of data, fix byteorder and size
     try:
-        socket.sendall(len(raw).to_bytes(8, 'big'))
+        socket.sendall(convert_to_bytes(len(raw)))
         # No need to chunk as we have it all in memory
         socket.sendall(raw)
         print('Sent')
     except OSError as e:
         print('Cannot establish connection during sending' + str(e))
-        sys.exit(1)
+        return
 
 
 def recv_file(socket, file_name):
@@ -59,7 +76,7 @@ def recv_file(socket, file_name):
             break
 
     # the expected file length
-    expected_size = int.from_bytes(expected_size, 'big')
+    expected_size = bytes_to_number(expected_size)
 
     # keep receiving until we reach expected length of file
     packet = b""
