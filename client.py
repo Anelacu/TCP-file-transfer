@@ -70,7 +70,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
 
     msg = command + ',' + file_name ## there is something wrong with sys args
-    print(msg)
+    print('cli',  msg)
     sent = s.sendall((msg).encode())
     if command == "get":
         status = s.recv(1024).decode()

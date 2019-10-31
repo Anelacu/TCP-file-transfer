@@ -7,7 +7,6 @@ import os
 from os import listdir
 from os.path import curdir
 
-
 def send_file(socket, file_name):
     """
     Opens the file with the given file name and sends its data over networwk
@@ -39,8 +38,8 @@ def send_file(socket, file_name):
         data = r.read()
         # check data length in bytes and send it to client
         data_length = len(data)
-        socket.send(data_length.to_bytes(4, 'big'))
-        socket.send(data)
+        socket.sendall(data_length.to_bytes(16, 'big'))
+        socket.sendall(data)
 
 
 def recv_file(socket, file_name):
@@ -88,16 +87,20 @@ def recv_file(socket, file_name):
         print("There was en error with writing to the file.")
         sys.exit(1)'''
 
-    remaining = int.from_bytes(socket.recv(4), 'big')
-    d = open(file_name, "wb")
-    while remaining:
-        # until there are bytes left...
-        # fetch remaining bytes or 4094 (whatever smaller)
-        rbuf = socket.recv(min(remaining, 4096))
-        remaining -= len(rbuf)
-        # write to file
-        d.write(rbuf)
-    d.close()
+    remaining = int.from_bytes(socket.recv(16), 'big')
+    try:
+        d = open(file_name, "xb")
+        while remaining:
+            # until there are bytes left...
+            # fetch remaining bytes or 4094 (whatever smaller)
+            rbuf = socket.recv(min(remaining, 4096))
+            remaining -= len(rbuf)
+            # write to file
+            d.write(rbuf)
+        d.close()
+    except IOError as e:
+        print(e)
+        return
 
 
 def send_listing(socket, file_name):
