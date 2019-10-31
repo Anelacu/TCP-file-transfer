@@ -15,15 +15,18 @@ def send_file(socket, file_name):
         param2 (str): The file name.
     Raises:
         OSError if can not establish connection
-        IOError if encounters errors with file
     """
-    
+
     with open(file_name, 'rb') as r:
         data = r.read()
         # check data length in bytes and send it to client
         data_length = len(data)
-        socket.sendall(data_length.to_bytes(16, 'big'))
-        socket.sendall(data)
+        try:
+            socket.sendall(data_length.to_bytes(16, 'big'))
+            socket.sendall(data)
+        except OSError as e:
+            print('Could not establish connection on sending ' + str(e))
+            return
 
 
 def recv_file(socket, file_name):
@@ -39,17 +42,15 @@ def recv_file(socket, file_name):
     """
     remaining = int.from_bytes(socket.recv(16), 'big')
     try:
-        d = open(file_name, "xb")
+        data = open(file_name, "xb")
         while remaining:
-            # until there are bytes left...
-            # fetch remaining bytes or 4094 (whatever smaller)
+            # fetch remaining bytes or 4094 (whichever is smaller)
             rbuf = socket.recv(min(remaining, 4096))
             remaining -= len(rbuf)
-            # write to file
-            d.write(rbuf)
-        d.close()
+            data.write(rbuf)
+        data.close()
     except IOError as e:
-        print(e)
+        print('Error on receiving file' + str(e))
         return
 
 
@@ -69,7 +70,7 @@ def send_listing(socket, file_name):
         print("There was an error reading the directories.")
         sys.exit(1)
 
-    # Send actual length ahead of data, fix byteorder and size
+    # Send actual length ahead of listing, fix byteorder and size
     try:
         socket.sendall(len(data).to_bytes(8, 'big'))
         # No need to chunk as we have it all in memory
@@ -100,7 +101,7 @@ def recv_listing(socket, file_name):
             print('Cannot establish connection during receiving' + str(e))
             sys.exit(1)
 
-    # the expected file length
+    # the expected directory listing length
     expected_size = int.from_bytes(expected_size, 'big')
 
     # keep receiving until we reach expected length of directory listing
