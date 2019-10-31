@@ -9,7 +9,7 @@ from utilities import recv_file, send_file, send_listing
 # Define hostname and get port from user
 HOST = '0.0.0.0'
 if len(sys.argv) != 2:
-    print('Expected just a port number')
+    print('Expected one argument: a port number')
     sys.exit(1)
 try:
     PORT = int(sys.argv[1])
@@ -26,7 +26,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
         print('Server up and running.')
     except OSError as e:
-        print('Can not establish server.' + str(e))
+        print('Cannot establish server.' + str(e))
         sys.exit(1)
 
     s.listen(5)
@@ -36,16 +36,18 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             cli_socket, addr = s.accept()
             print("Server accepted a connection." )
         except OSError as e:
-            print('Can not connect to client.' + str(e))
+            print('Cannot connect to client.' + str(e))
             break
 
         # Received and process request from client
         while True:
             try:
                 data = cli_socket.recv(1024).decode()
-                command, file_name = data.split(",")
+                command , file_name = data.split(",")
             except OSError as e:
                 print('Error establishing connection ' + str(e))
+                break
+            except:
                 break
 
             # To handle file not existing server side on client request
@@ -68,5 +70,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 break
 
         cli_socket.close()
-        print("Server closed connection successfully.")
+        print("Server closed connection successfully." + "\n")
     print('Done receiving request.')

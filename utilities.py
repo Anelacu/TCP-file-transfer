@@ -24,6 +24,8 @@ def send_file(socket, file_name):
         try:
             socket.sendall(data_length.to_bytes(16, 'big'))
             socket.sendall(data)
+            print("Sent the file")
+
         except OSError as e:
             print('Could not establish connection on sending ' + str(e))
             return
@@ -47,13 +49,16 @@ def recv_file(socket, file_name):
             # fetch remaining bytes or 4094 (whichever is smaller)
             try:
                 rbuf = socket.recv(min(remaining, 4096))
-            except OSError as e:
-                print('Connection failed ' + str(e))
+            except:
+                print('Connection failed ')
             remaining -= len(rbuf)
             data.write(rbuf)
         data.close()
+        print("Received the file")
     except IOError as e:
         print('Error on receiving file' + str(e))
+        return
+    except:
         return
 
 
@@ -119,4 +124,5 @@ def recv_listing(socket, file_name):
             raise Exception("Incomplete directory listing received")
         packet += buffer
     data = packet.decode()
-    print(data + '\n')
+    print("Listing:")
+    print(data, end='')

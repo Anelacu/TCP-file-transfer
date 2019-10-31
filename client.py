@@ -18,7 +18,7 @@ try:
     hostname = str(sys.argv[1])
     port_no = int(sys.argv[2])
     command = str(sys.argv[3])
-    file_name = ''
+    file_name = '.'
 
     if command == "put":
         file_name = str(sys.argv[4])
@@ -54,7 +54,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("Client connected")
 
     msg = command + ',' + file_name
-    print('cli',  msg)
     sent = s.sendall(msg.encode())
     # Only proceed with get request if file exists server side
     if command == "get":
@@ -62,7 +61,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         if status == "Good file name":
             received = call[command](s, file_name)
         else:
-            print("Check file name")
+            print("Wrong file name")
             sys.exit(1)
     else:
         received = call[command](s, file_name)
