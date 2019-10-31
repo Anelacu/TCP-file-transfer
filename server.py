@@ -1,37 +1,21 @@
 # server.py file for NOSE assessed exercise 1
 # Authors - Magdalena Latifa 2398248l and Ivan Nikitin 2292523n
 # Lab group LB10
-"""
-Purpose of server.py:
-    upload a file (request type and the filename -- exclusive binary mode)
-        same as recv_file()
-    download a file (open the file in binary mode)
-        same as send_file()
-    list 1st level directory contents
-        i.e. send_listing()
-
-print reoprt on the console after a request was processed
-"""
 import sys
 import socket
 import os
 from utilities import recv_file, send_file, send_listing
 
-# helper function to debug, can replace all with sys.exit(1) later
-def exit():
-    print('exit')
-    sys.exit(1)
-
 # Define hostname and get port from user
 HOST = '0.0.0.0'
 if len(sys.argv) != 2:
     print('Expected just a port number')
-    exit()
+    sys.exit(1)
 try:
     PORT = int(sys.argv[1])
 except ValueError:
     print("Invalid argument - int expected")
-    exit()
+    sys.exit(1)
 
 call = {"put": recv_file, "get": send_file, "list": send_listing}
 
@@ -43,7 +27,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print('Server up and running.')
     except OSError as e:
         print('Can not establish server.' + str(e))
-        exit()
+        sys.exit(1)
 
     s.listen(5)
     while True:
@@ -55,15 +39,17 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print('Can not connect to client.' + str(e))
             break
 
-        # Recieved and process request from client
+        # Received and process request from client
         while True:
             try:
                 data = cli_socket.recv(1024).decode()
                 command, file_name = data.split(",")
-            except:
+            except OSError as e:
+                print('Error establishing connection ' + str(e))
                 break
 
-            if (command == 'get'):
+            # To handle file not existing server side on client request
+            if command == 'get':
                 if not os.path.exists(file_name):
                     cli_socket.sendall(b"Bad file name")
                     break
@@ -74,6 +60,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 print("Server got no data")
                 break
 
+            # Use dictionary to process request calls
             sent = call[command](cli_socket, file_name)
 
             if sent == 0:
@@ -81,5 +68,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 break
 
         cli_socket.close()
-        print("Server closed connection succesfully.")
+        print("Server closed connection successfully.")
     print('Done receiving request.')

@@ -5,11 +5,11 @@ import socket
 import sys
 import os
 from os import listdir
-from os.path import curdir
+
 
 def send_file(socket, file_name):
     """
-    Opens the file with the given file name and sends its data over networwk
+    Opens the file with the given file name and sends its data over network
     Args:
         param1(socket): The socket.
         param2 (str): The file name.
@@ -45,7 +45,10 @@ def recv_file(socket, file_name):
         data = open(file_name, "xb")
         while remaining:
             # fetch remaining bytes or 4094 (whichever is smaller)
-            rbuf = socket.recv(min(remaining, 4096))
+            try:
+                rbuf = socket.recv(min(remaining, 4096))
+            except OSError as e:
+                print('Connection failed ' + str(e))
             remaining -= len(rbuf)
             data.write(rbuf)
         data.close()
@@ -59,7 +62,7 @@ def send_listing(socket, file_name):
     Generates and sends the directory listing from the server to the client
     Args:
         param1(socket): The socket
-        param2(file): redundant but used for consistancy of calls
+        param2(file): redundant but used for consistency of calls
     Raises:
         OSError if can not establish connection
         IOError if encounters errors with directory listing
@@ -87,7 +90,7 @@ def recv_listing(socket, file_name):
     Receives the listing from the server and prints it on the screen
     Args:
         param1(socket): The socket
-        param2(file): redundant but used for consistancy of calls
+        param2(file): redundant but used for consistency of calls
     Raises:
         OSError if can not establish connection
         IOError if encounters errors with directory listing
