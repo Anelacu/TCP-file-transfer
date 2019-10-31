@@ -18,7 +18,7 @@ def send_file(socket, file_name):
         OSError if can not establish connection
         IOError if encounters errors with file
     """
-    print("Sending:", file_name)
+    '''print("Sending:", file_name)
     try:
         with open(file_name, 'rb') as f:
             raw = f.read()
@@ -34,7 +34,13 @@ def send_file(socket, file_name):
         print('Sent')
     except OSError as e:
         print('Cannot establish connection during sending' + str(e))
-        return
+        return'''
+    with open(file_name, 'rb') as r:
+        data = r.read()
+        # check data length in bytes and send it to client
+        data_length = len(data)
+        socket.send(data_length.to_bytes(4, 'big'))
+        socket.send(data)
 
 
 def recv_file(socket, file_name):
@@ -49,7 +55,7 @@ def recv_file(socket, file_name):
         IOError if encounters errors with file
     """
     # Get the expected length which will always be 8 bytes
-    print('Accepting' + file_name)
+    '''print('Accepting' + file_name)
     expected_size = b""
     while len(expected_size) < 8:
         try:
@@ -80,7 +86,18 @@ def recv_file(socket, file_name):
             print('File received')
     except IOError:
         print("There was en error with writing to the file.")
-        sys.exit(1)
+        sys.exit(1)'''
+
+    remaining = int.from_bytes(socket.recv(4), 'big')
+    d = open(file_name, "wb")
+    while remaining:
+        # until there are bytes left...
+        # fetch remaining bytes or 4094 (whatever smaller)
+        rbuf = socket.recv(min(remaining, 4096))
+        remaining -= len(rbuf)
+        # write to file
+        d.write(rbuf)
+    d.close()
 
 
 def send_listing(socket, file_name):
@@ -93,7 +110,6 @@ def send_listing(socket, file_name):
         OSError if can not establish connection
         IOError if encounters errors with directory listing
     """
-    print("Sending:", file_name)
     try:
         data = '\n'.join(listdir(os.path.curdir))
     except IOError:

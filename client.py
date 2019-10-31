@@ -81,5 +81,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             sys.exit(1)
     else:
         received = call[command](s, file_name)
-
     exit()
