@@ -1,6 +1,4 @@
-# client.py file for NOSE assessed exercise 1
-# Authors - Magdalena Latifa 2398248l and Ivan Nikitin 2292523n
-# Lab group LB10
+# Authors - Magdalena Latifa and Ivan Nikitin
 import socket
 import sys
 from utilities import send_file, recv_file, recv_listing

@@ -1,6 +1,4 @@
-# Utility funcitons to be used by client.py and server.py
-# Authors - Magdalena Latifa 2398248l and Ivan Nikitin 2292523n
-# Lab group LB10
+# Authors - Magdalena Latifa and Ivan Nikitin
 import socket
 import sys
 import os

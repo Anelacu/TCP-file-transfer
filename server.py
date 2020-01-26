@@ -1,6 +1,4 @@
-# server.py file for NOSE assessed exercise 1
-# Authors - Magdalena Latifa 2398248l and Ivan Nikitin 2292523n
-# Lab group LB10
+# Authors - Magdalena Latifa and Ivan Nikitin
 import sys
 import socket
 import os
@@ -34,7 +32,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # Connect with client, if that doesn't work break from current request
         try:
             cli_socket, addr = s.accept()
-            print("Server accepted a connection." )
+            print("Server accepted a connection.")
         except OSError as e:
             print('Cannot connect to client.' + str(e))
             break
